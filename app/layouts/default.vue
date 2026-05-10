@@ -1,6 +1,14 @@
 <template>
-  <div>
-    <MainNavigation />
-    <slot />
+  <div class="flex flex-col h-screen">
+    <!-- <MainNavigation /> -->
+    <!-- Header -->
+    <shared-header />
+
+    <main class="container mx-auto flex-1 mt-2">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+     <shared-footer />
   </div>
 </template>

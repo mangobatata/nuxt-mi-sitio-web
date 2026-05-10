@@ -1,9 +1,10 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
+  <UApp>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </UApp>
 </template>
-
 <!-- <script lang="ts" setup>
 const count = ref(10);
 await sleep(2000);
