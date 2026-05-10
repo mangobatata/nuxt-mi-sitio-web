@@ -1,5 +1,5 @@
 {
-  "name": "intro-nuxt",
+  "name": "nuxt-app",
   "type": "module",
   "private": true,
   "scripts": {
@@ -10,8 +10,8 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "nuxt": "^4.3.1",
-    "vue": "^3.5.28",
-    "vue-router": "^4.6.4"
+    "nuxt": "^4.4.4",
+    "vue": "^3.5.33",
+    "vue-router": "^5.0.6"
   }
 }
