@@ -1,75 +1,29 @@
-# Nuxt Minimal Starter
+En esta sección aprenderás a conectar tu aplicación Nuxt con una base de datos PostgreSQL, utilizando el sistema de Server API routes de Nuxt para construir un backend dentro del mismo proyecto. 
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
-## Setup
 
-Make sure to install dependencies:
+Implementaremos Prisma como ORM, aprovisionaremos la base de datos en la nube, crearemos modelos, endpoints y realizaremos una semilla inicial. Esta sección marca la transición hacia un proyecto de aplicación full-stack con Nuxt.
 
-```bash
-# npm
-npm install
 
-# pnpm
-pnpm install
 
-# yarn
-yarn install
+Puntualmente veremos:
 
-# bun
-bun install
-```
+Server API en Nuxt
 
-## Development Server
+Endpoints server/api/*
 
-Start the development server on `http://localhost:3000`:
+Variables de entorno
 
-```bash
-# npm
-npm run dev
+PostgreSQL en la nube (NeonTech)
 
-# pnpm
-pnpm dev
+Prisma ORM
 
-# yarn
-yarn dev
+Modelado de datos
 
-# bun
-bun run dev
-```
+Migraciones
 
-## Production
+Seeds (semilla de datos)
 
-Build the application for production:
+Consultas desde el servidor
 
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Renderizado de datos en páginas Nuxt
