@@ -1,54 +1,63 @@
 <script setup lang="ts">
-import * as z from 'zod'
-import type { FormSubmitEvent, AuthFormField } from '@nuxt/ui'
+import * as z from "zod";
+import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
 
 definePageMeta({
-  layout: 'login-layout',
+  layout: "login-layout",
 });
 
-const toast = useToast()
+const toast = useToast();
 
-const fields: AuthFormField[] = [{
-  name: 'email',
-  type: 'email',
-  label: 'Email',
-  placeholder: 'Enter your email',
-  required: true
-}, {
-  name: 'password',
-  label: 'Password',
-  type: 'password',
-  placeholder: 'Enter your password',
-  required: true
-}, {
-  name: 'remember',
-  label: 'Remember me',
-  type: 'checkbox'
-}]
+const fields: AuthFormField[] = [
+  {
+    name: "email",
+    type: "email",
+    label: "Correo electrónico",
+    placeholder: "Ingresa tu correo electrónico",
+    required: true,
+  },
+  {
+    name: "password",
+    label: "Contraseña",
+    type: "password",
+    placeholder: "Ingresa tu contraseña",
+    required: true,
+  },
+  {
+    name: "remember",
+    label: "Recuérdame",
+    type: "checkbox",
+  },
+];
 
-const providers = [{
-  label: 'Google',
-  icon: 'i-simple-icons-google',
-  onClick: () => {
-    toast.add({ title: 'Google', description: 'Login with Google' })
-  }
-}, {
-  label: 'GitHub',
-  icon: 'i-simple-icons-github',
-  onClick: () => {
-    toast.add({ title: 'GitHub', description: 'Login with GitHub' })
-  }
-}]
+const providers = [
+  {
+    label: "Google",
+    icon: "i-simple-icons-google",
+    onClick: () => {
+      toast.add({ title: "Google", description: "Login with Google" });
+    },
+  },
+  {
+    label: "GitHub",
+    icon: "i-simple-icons-github",
+    onClick: () => {
+      toast.add({ title: "GitHub", description: "Login with GitHub" });
+    },
+  },
+];
 
 const schema = z.object({
-  email: z.email('Invalid email'),
-  password: z.string('Password is required').min(8, 'Must be at least 8 characters')
-})
+  email: z.email("Correo electrónico inválido"),
+  password: z
+    .string("La contraseña es requerida")
+    .min(8, "Debe tener al menos 8 caracteres"),
+});
 
-type Schema = z.output<typeof schema>
+type Schema = z.output<typeof schema>;
 
 function onSubmit(payload: FormSubmitEvent<Schema>) {
-  console.log('Submitted', payload)
+  console.log("Submitted", payload);
 }
 </script>
 
@@ -57,14 +66,23 @@ function onSubmit(payload: FormSubmitEvent<Schema>) {
     <UPageCard class="w-full max-w-md">
       <UAuthForm
         :schema="schema"
-        title="Login"
-        description="Enter your credentials to access your account."
+        title="Iniciar sesión"
+        description="Ingresa tus credenciales para acceder a tu cuenta."
         icon="i-lucide-user"
         :fields="fields"
         :providers="providers"
         @submit="onSubmit"
+        :ui="{
+          leadingIcon: 'text-5xl',
+        }"
       />
     </UPageCard>
+
+    <UButton
+      color="primary"
+      variant="ghost"
+      label="¿No tienes cuenta? Regístrate"
+      to="/register"
+    />
   </div>
 </template>
-
