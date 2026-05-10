@@ -27,6 +27,7 @@ const tiers = [
     button: { label: 'Contactar ventas', color: 'neutral' as const },
   },
 ];
+
 const sections = [
   {
     id: 'features',
@@ -55,6 +56,7 @@ const sections = [
     ],
   },
 ];
+
 const plans = ref([
   {
     title: 'Individual',

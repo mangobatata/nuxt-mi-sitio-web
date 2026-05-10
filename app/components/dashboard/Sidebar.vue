@@ -5,6 +5,7 @@ import {
   type CommandPaletteItem,
   type NavigationMenuItem,
 } from "@nuxt/ui";
+
 const items: NavigationMenuItem[][] = [
   [
     {
