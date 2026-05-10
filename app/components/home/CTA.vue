@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { ButtonProps } from "@nuxt/ui";
 
+const { data } = await useFetch("/api/hello-world");
+
 const links = ref<ButtonProps[]>([
   {
     label: "Empezando",
@@ -78,7 +80,7 @@ const links = ref<ButtonProps[]>([
             <h2
               class="text-4xl font-extrabold leading-tight tracking-tight text-gray-950 lg:text-5xl dark:text-white"
             >
-              Confiado y apoyado por nuestra
+              {{ data?.message }} con una
               <span
                 class="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent"
               >
@@ -92,8 +94,7 @@ const links = ref<ButtonProps[]>([
           <p
             class="mt-1 max-w-sm text-base leading-relaxed text-gray-600 dark:text-gray-400"
           >
-            Hemos construido una asociación sólida y duradera. Su confianza es
-            nuestra fuerza impulsora, llevándonos hacia el éxito compartido.
+            {{ data?.description }}
           </p>
 
           <!-- Stats row -->
