@@ -22,7 +22,7 @@ const testimonials = ref([
       },
     },
     quote:
-      'Me encanta el pulido y el enfoque de "baterías incluidas". NuxtHub lleva la integración del marco web y el hosting a un nuevo nivel.',
+      "Me encanta el pulido y el enfoque de baterías incluidas. NuxtHub lleva la integración del marco web y el hosting a un nuevo nivel.",
   },
   {
     user: {
@@ -34,7 +34,7 @@ const testimonials = ref([
       },
     },
     quote:
-      "¡NuxtHub es, sin duda, la forma más fácil de llevar un proyecto de cero a producción en la pila de Cloudflare!",
+      "NuxtHub es, sin duda, la forma más fácil de llevar un proyecto de cero a producción en la pila de Cloudflare.",
   },
   {
     user: {
@@ -46,7 +46,7 @@ const testimonials = ref([
       },
     },
     quote:
-      "No puedo encontrar una excusa para no ir full-stack con Nuxt de ahora en adelante. Despliega rápido a la manera de Nuxt, sin configuración. Solo conecta y despliega.",
+      "No puedo encontrar una excusa para no ir full-stack con Nuxt. Despliega rápido a la manera de Nuxt, sin configuración. Solo conecta y despliega.",
   },
   {
     user: {
@@ -70,7 +70,7 @@ const testimonials = ref([
       },
     },
     quote:
-      "Nuxt se está convirtiendo en el mejor marco para quienes inician, en mi opinión. NuxtHub es una capa sobre los servicios de Cloudflare para un hosting full-stack rápido y económico en el edge.",
+      "Nuxt se está convirtiendo en el mejor marco para quienes inician. NuxtHub es una capa sobre Cloudflare para un hosting full-stack rápido y económico en el edge.",
   },
   {
     user: {
@@ -82,7 +82,7 @@ const testimonials = ref([
       },
     },
     quote:
-      "Me encanta cómo NuxtHub combina, amplifica y simplifica las herramientas de Cloudflare con el amplio y maduro ecosistema de Nuxt. ¡No puedo esperar a ver cómo evolucionará y se expandirá en el futuro!",
+      "Me encanta cómo NuxtHub combina, amplifica y simplifica las herramientas de Cloudflare con el amplio y maduro ecosistema de Nuxt.",
   },
   {
     user: {
@@ -94,7 +94,7 @@ const testimonials = ref([
       },
     },
     quote:
-      "¡Acabo de desplegar mi primer sitio en Cloudflare usando NuxtHub. ¡Una experiencia muy elegante!",
+      "Acabo de desplegar mi primer sitio en Cloudflare usando NuxtHub. ¡Una experiencia muy elegante!",
   },
   {
     user: {
@@ -106,7 +106,7 @@ const testimonials = ref([
       },
     },
     quote:
-      "¡Es increíble poder ejecutar un solo comando y desplegar un proyecto Nuxt existente en el edge en minutos! Se sintió como desbloquear la infraestructura y la interfaz que faltaban para Cloudflare, mejorando la experiencia del desarrollador de una manera extraordinaria.",
+      "Es increíble ejecutar un solo comando y desplegar un proyecto Nuxt en el edge en minutos. Como desbloquear la infraestructura que faltaba para Cloudflare.",
   },
   {
     user: {
@@ -118,7 +118,7 @@ const testimonials = ref([
       },
     },
     quote:
-      "NuxtHub y Cloudflare son mi opción para aplicaciones full stack. La experiencia de desarrollo es alegre y muy superior a cualquier otra plataforma que he utilizado. Mi equipo puede iterar rápidamente y construir aplicaciones hermosas y eficientes con facilidad.",
+      "NuxtHub y Cloudflare son mi opción para aplicaciones full stack. La experiencia de desarrollo es alegre y muy superior a cualquier otra plataforma.",
   },
   {
     user: {
@@ -130,43 +130,120 @@ const testimonials = ref([
       },
     },
     quote:
-      "En YG, nuestro equipo creció recientemente y eso significó más asientos en todas las herramientas que usamos. Migrar nuestro flujo de trabajo de hosting a NuxtHub no solo tomó unos minutos, sino que nos ahorró dinero en comparación con nuestro proveedor anterior. NuxtHub proporciona una excelente capa de gestión sobre nuestra infraestructura y estamos muy contentos con el cambio.",
+      "Migrar a NuxtHub no solo tomó unos minutos, sino que nos ahorró dinero. Proporciona una excelente capa de gestión sobre nuestra infraestructura.",
   },
 ]);
 </script>
 
 <template>
-  <div>
-    <UPageSection
-      title="Testimonios"
-      description="Nuestros testimonios de clientes satisfechos"
-      headline="Testimonios"
-    />
-
-    <UPageColumns>
-      <UPageCard
-        variant="solid"
-        to="https://cloudflare.com"
-        icon="i-logos-cloudflare-icon"
-        title="Cloudflare's Workers LaunchPad"
-        description="NuxtHub is part of the Cloudflare's Workers Launchpad Cohort to make sure you get a first-class experience on top of Cloudflare's network."
-        :ui="{ leadingIcon: 'size-10' }"
+  <section
+    class="relative overflow-hidden bg-white px-6 py-24 transition-colors duration-300 lg:px-12 dark:bg-gray-950"
+  >
+    <!-- Ambient background -->
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div
+        class="absolute left-1/2 top-0 h-72 w-[800px] -translate-x-1/2 rounded-full bg-indigo-600/5 blur-[100px]"
       />
+      <div
+        class="absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-white/8"
+      />
+    </div>
 
-      <UPageCard
-        v-for="(testimonial, index) in testimonials"
-        :key="index"
-        variant="subtle"
-        :description="testimonial.quote"
-        :ui="{
-          description:
-            'before:content-[open-quote] after:content-[close-quote]',
-        }"
+    <UContainer class="relative">
+      <!-- Section header -->
+      <div class="mb-16 text-center">
+        <div class="mb-4 flex items-center justify-center gap-3">
+          <div class="h-px w-8 bg-indigo-500" />
+          <span
+            class="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400"
+          >
+            Testimonios
+          </span>
+          <div class="h-px w-8 bg-indigo-500" />
+        </div>
+        <h2
+          class="text-4xl font-extrabold tracking-tight text-gray-950 lg:text-5xl dark:text-white"
+        >
+          Lo que dice nuestra
+          <span class="text-gray-500 dark:text-gray-500"> comunidad</span>
+        </h2>
+        <p
+          class="mx-auto mt-4 max-w-md text-sm leading-relaxed text-gray-600 dark:text-gray-500"
+        >
+          Desarrolladores de todo el mundo confían en NuxtHub para sus proyectos
+          en producción.
+        </p>
+      </div>
+
+      <!-- Cloudflare featured card -->
+
+      <a
+        href="https://cloudflare.com"
+        target="_blank"
+        class="group mb-6 flex items-center justify-between gap-6 rounded-2xl border border-orange-500/20 bg-gradient-to-r from-orange-500/10 via-amber-500/5 to-transparent p-6 transition-all duration-300 hover:border-orange-500/40 hover:from-orange-500/15"
       >
-        <template #footer>
-          <UUser v-bind="testimonial.user" size="xl" />
-        </template>
-      </UPageCard>
-    </UPageColumns>
-  </div>
+        <div class="flex items-center gap-5">
+          <div
+            class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-orange-500/20 bg-orange-500/10"
+          >
+            <UIcon name="i-logos-cloudflare-icon" class="size-8" />
+          </div>
+          <div>
+            <p class="font-bold text-gray-950 dark:text-white">
+              Cloudflare Workers LaunchPad
+            </p>
+            <p class="mt-0.5 text-sm text-gray-600 dark:text-gray-400">
+              NuxtHub es parte del cohort de Cloudflare Workers Launchpad — una
+              experiencia de primera clase sobre la red de Cloudflare.
+            </p>
+          </div>
+        </div>
+        <UIcon
+          name="i-lucide-arrow-right"
+          class="size-5 shrink-0 text-orange-400 transition-transform duration-300 group-hover:translate-x-1"
+        />
+      </a>
+
+      <!-- Masonry columns -->
+      <div class="columns-1 gap-4 sm:columns-2 lg:columns-3">
+        <div
+          v-for="(testimonial, index) in testimonials"
+          :key="index"
+          class="group mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:border-gray-300 hover:bg-gray-50 dark:border-white/[0.06] dark:bg-white/[0.03] dark:hover:border-white/[0.12] dark:hover:bg-white/[0.05]"
+        >
+          <!-- Giant decorative quote mark -->
+          <div
+            class="mb-3 font-serif text-6xl leading-none text-indigo-500/20 transition-colors duration-300 group-hover:text-indigo-500/30"
+            aria-hidden="true"
+          >
+            "
+          </div>
+
+          <!-- Quote -->
+          <p class="mb-6 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+            {{ testimonial.quote }}
+          </p>
+
+          <!-- Author -->
+          <div
+            class="flex items-center gap-3 border-t border-gray-200 pt-4 dark:border-white/[0.06]"
+          >
+            <img
+              :src="testimonial.user.avatar.src"
+              :alt="testimonial.user.avatar.alt"
+              class="h-9 w-9 rounded-full object-cover ring-1 ring-gray-200 dark:ring-white/10"
+            />
+            <div>
+              <p class="text-sm font-semibold text-gray-950 dark:text-white">
+                {{ testimonial.user.name }}
+              </p>
+              <p class="text-xs text-gray-500 dark:text-gray-500">
+                {{ testimonial.user.description }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </UContainer>
+  </section>
 </template>
