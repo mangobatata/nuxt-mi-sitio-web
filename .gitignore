@@ -24,3 +24,11 @@ logs
 !.env.example
 
 /app/generated/prisma
+
+# AI Agents
+.agents
+.codex
+
+/lib/generated/prisma
+
+/app/generated/prisma

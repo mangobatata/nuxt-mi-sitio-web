@@ -1,6 +1,6 @@
 En esta sección aprenderás a conectar tu aplicación Nuxt con una base de datos PostgreSQL, utilizando el sistema de Server API routes de Nuxt para construir un backend dentro del mismo proyecto. 
 
-
+[Nuxt - Prisma](https://www.prisma.io/docs/guides/frameworks/nuxt)
 
 Implementaremos Prisma como ORM, aprovisionaremos la base de datos en la nube, crearemos modelos, endpoints y realizaremos una semilla inicial. Esta sección marca la transición hacia un proyecto de aplicación full-stack con Nuxt.
 
