@@ -1,6 +1,6 @@
 export const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("es-MX", {
+  return new Intl.NumberFormat("es-PY", {
     style: "currency",
-    currency: "MXN",
+    currency: "PYG",
   }).format(value);
 };
