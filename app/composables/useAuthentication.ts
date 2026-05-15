@@ -1,5 +1,5 @@
 export const useAuthentication = () => {
-  const { loggedIn, session, user, clear, fetch } = useUserSession();
+  const { loggedIn, session, user, clear, fetch, ready } = useUserSession();
 
   const login = async (email: string, password: string) => {
     try {
@@ -9,7 +9,7 @@ export const useAuthentication = () => {
       });
 
       await fetch();
-      navigateTo("/?message=Login successful");
+      await navigateTo("/?message=Login successful");
 
       return true;
     } catch (error) {
@@ -30,7 +30,7 @@ export const useAuthentication = () => {
       });
 
       await fetch();
-      navigateTo("/?message=Registration successful");
+      await navigateTo("/?message=Registration successful");
 
       return true;
     } catch (error) {
@@ -41,17 +41,18 @@ export const useAuthentication = () => {
 
   const logout = async () => {
     await clear();
-    navigateTo("/?message=Logout successful");
+    await navigateTo("/?message=Logout successful");
   };
 
   return {
+    ready,
     loggedIn,
     session,
     user,
 
     // Getters
-    // isLoggedIn: loggedIn,
-    // isAdmin: computed(() => user.value?.roles.includes('admin')),
+    isLoggedIn: loggedIn,
+    isAdmin: computed(() => user.value?.roles.includes("admin") ?? false),
 
     // Methods, Acciones
     fetch,

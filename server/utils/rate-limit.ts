@@ -62,7 +62,7 @@ export const assertRateLimit = (
   setHeader(event, "X-RateLimit-Reset", secondsUntilReset.toString());
 
   if (bucket.count >= maxRequests) {
-    setHeader(event, "Retry-After", secondsUntilReset.toString());
+    setHeader(event, "Retry-After", secondsUntilReset);
 
     throw createError({
       statusCode: 429,

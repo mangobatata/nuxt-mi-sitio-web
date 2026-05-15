@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import * as z from "zod";
-import type { FormSubmitEvent, AuthFormField } from "@nuxt/ui";
+import type { AuthFormField } from "#ui/components/AuthForm.vue";
+import type { FormSubmitEvent } from "@nuxt/ui";
 
 definePageMeta({
   layout: "login-layout",
+  middleware: "not-authenticated",
 });
 
 const toast = useToast();
@@ -79,6 +81,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
   const isSuccessful = await login(email, password);
 
   if (!isSuccessful) {
+    isPosting.value = false;
     toast.add({
       title: "Login failed",
       description: "Credenciales no son válidas",
@@ -98,6 +101,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         :fields="fields"
         :providers="providers"
         @submit="onSubmit"
+        :loading="isPosting"
+        :disabled="isPosting"
         :ui="{
           leadingIcon: 'text-5xl',
         }"

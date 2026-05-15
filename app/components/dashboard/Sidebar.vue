@@ -3,8 +3,10 @@
 import {
   type CommandPaletteGroup,
   type CommandPaletteItem,
+} from "#ui/components/CommandPalette.vue";
+import {
   type NavigationMenuItem,
-} from "@nuxt/ui";
+} from "#ui/components/NavigationMenu.vue";
 
 const items: NavigationMenuItem[][] = [
   [

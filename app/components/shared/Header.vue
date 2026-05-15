@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { NavigationMenuItem } from "@nuxt/ui";
+import type { NavigationMenuItem } from "#ui/components/NavigationMenu.vue";
 
 const route = useRoute();
+const { isLoggedIn, logout } = useAuthentication();
 
 const items = computed<NavigationMenuItem[]>(() => [
   {
@@ -28,14 +29,24 @@ const items = computed<NavigationMenuItem[]>(() => [
   },
 ]);
 
-const responsiveMenu = ref([
+const responsiveMenu = computed<NavigationMenuItem[]>(() => [
   ...items.value,
-  {
-    label: "Iniciar sesión",
-    to: "/login",
-    icon: "i-lucide-log-in",
-    active: route.path.startsWith("/login"),
-  },
+  ...(isLoggedIn.value
+    ? [
+        {
+          label: "Cerrar sesión",
+          icon: "i-lucide-log-out",
+          onSelect: logout,
+        },
+      ]
+    : [
+        {
+          label: "Iniciar sesión",
+          to: "/login",
+          icon: "i-lucide-log-in",
+          active: route.path.startsWith("/login"),
+        },
+      ]),
 ]);
 </script>
 
@@ -61,13 +72,24 @@ const responsiveMenu = ref([
         />
       </UTooltip>
 
-      <UButton
-        color="primary"
-        variant="soft"
-        icon="i-heroicons-user-circle"
-        to="/login"
-        label="Login"
-      />
+      <ClientOnly>
+        <UButton
+          v-if="!isLoggedIn"
+          color="primary"
+          variant="soft"
+          icon="i-heroicons-user-circle"
+          to="/login"
+          label="Login"
+        />
+
+        <UButton
+          v-else
+          variant="ghost"
+          icon="i-heroicons-user-circle"
+          label="Cerrar sesión"
+          @click="logout"
+        />
+      </ClientOnly>
     </template>
 
     <template #body>

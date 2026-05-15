@@ -12,7 +12,7 @@ import { h, resolveComponent } from "vue";
 
 // Importamos el tipo TableColumn desde Nuxt UI.
 // Esto ayuda a TypeScript a saber cómo debe ser la estructura de las columnas.
-import type { TableColumn } from "@nuxt/ui";
+import type { TableColumn } from "#ui/components/Table.vue";
 
 // Importamos una función utilitaria para formatear fechas.
 // Por ejemplo: convertir una fecha ISO en formato día/mes/año.

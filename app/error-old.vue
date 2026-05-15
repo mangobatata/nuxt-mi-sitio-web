@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import type { NuxtError } from "#app";
 
-defineProps<{
+const props = defineProps<{
   error: NuxtError;
 }>();
 
 const isDev = import.meta.dev;
 const router = useRouter();
+const errorUrl = computed(() => {
+  return typeof props.error.data === "object" &&
+    props.error.data !== null &&
+    "url" in props.error.data
+    ? String(props.error.data.url)
+    : "";
+});
 
 const handleError = () => {
   // router.push('/');
@@ -55,7 +62,7 @@ const goBack = () => {
           <div class="error-stack">
             <p><strong>Mensaje:</strong> {{ error.message }}</p>
             <p><strong>Status:</strong> {{ error.statusCode }}</p>
-            <p v-if="error.url"><strong>URL:</strong> {{ error.url }}</p>
+            <p v-if="errorUrl"><strong>URL:</strong> {{ errorUrl }}</p>
             <pre v-if="error.stack">{{ error.stack }}</pre>
           </div>
         </div>
