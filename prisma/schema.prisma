@@ -15,3 +15,15 @@ model SiteReview {
   profileImage String
   createdAt    DateTime @default(now())
 }
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  name        String
+  description String
+  price       Int
+  images      String[]
+  tags        String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
