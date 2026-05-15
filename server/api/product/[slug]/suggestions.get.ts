@@ -1,7 +1,7 @@
-import prisma from '@@/lib/prisma';
+import prisma from "@@/lib/prisma";
 
 export default defineEventHandler(async (event) => {
-  const slug = getRouterParam(event, 'slug');
+  const slug = getRouterParam(event, "slug");
 
   const product = await prisma.product.findUnique({
     where: {
@@ -37,5 +37,21 @@ export default defineEventHandler(async (event) => {
     take: 3,
   });
 
+  // if (suggestions.length >= 3) {
+  //   return suggestions;
+  // }
+
+  // const fallbackSuggestions = await prisma.product.findMany({
+  //   where: {
+  //     NOT: {
+  //       id: {
+  //         in: [product.id, ...suggestions.map((suggestion) => suggestion.id)],
+  //       },
+  //     },
+  //   },
+  //   take: 3 - suggestions.length,
+  // });
+
+  // return [...suggestions, ...fallbackSuggestions];
   return suggestions;
 });

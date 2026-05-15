@@ -1,17 +1,18 @@
 <script setup lang="ts">
 const route = useRoute();
 const slug = route.params.slug as string;
+// Simulación de productos - en producción esto vendría de una API
 
 const { product } = await useProduct(slug);
-const { products } = await usePaginatedProducts();
 
+// Si no se encuentra el producto, mostrar error 404
 if (!product.value) {
-  throw createError({
-    statusCode: 404,
-    statusMessage: "Producto no encontrado",
-  });
+  navigateTo('/404');
+  // throw createError({
+  //   statusCode: 404,
+  //   statusMessage: 'Producto no encontrado',
+  // });
 }
-
 // Estado para la imagen seleccionada
 const selectedImageIndex = ref(0);
 // Estado para cantidad
@@ -27,10 +28,8 @@ const decreaseQuantity = () => {
 const totalPrice = computed(() => {
   return (product.value?.price || 0) * quantity.value;
 });
-const relatedProducts = computed(() => {
-  return products.value.filter((item) => item.id !== product.value?.id).slice(0, 3);
-});
 </script>
+
 <template>
   <div v-if="product" class="container mx-auto px-4 py-8">
     <!-- Breadcrumb -->
@@ -168,14 +167,11 @@ const relatedProducts = computed(() => {
 
     <!-- Related Products Section (optional) -->
     <div v-if="product" class="mt-16">
-      <h2 class="text-2xl font-bold text-gray-900 mb-6">
+      <h2 class="text-2xl font-bold text-gray-500 mb-6">
         Productos relacionados
       </h2>
 
-      <LazyProductsGrid
-        hydrate-on-visible
-        :products="relatedProducts"
-      />
+      <ProductSuggestions :slug="slug" />
     </div>
   </div>
 </template>
