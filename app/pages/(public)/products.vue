@@ -26,7 +26,7 @@ const { products, total, currentPage, perPage } = await usePaginatedProducts();
 
   <div class="mt-10" />
 
-  <ProductsGrid :products="products || []" />
+  <ProductsGrid :products="products" />
 
   <SharedPagination
     :total="total"

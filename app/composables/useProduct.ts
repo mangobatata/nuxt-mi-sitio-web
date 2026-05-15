@@ -1,6 +1,6 @@
 export const useProduct = async (slug: string) => {
   const { data, error, status, clear, execute, refresh, pending } =
-    await useFetch(`/api/product/${slug}`);
+    await useFetch<Product>(`/api/product/${slug}`);
 
   return {
     data,
