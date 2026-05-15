@@ -1,25 +1,25 @@
-En esta sección se trabaja con endpoints del servidor en Nuxt para manejar datos dinámicos, parámetros de query, paginación y comunicación entre el backend y los composables del frontend. También se integran tablas y componentes perezosos.
+En esta sección aprenderás a implementar un sistema completo de autenticación y autorización en Nuxt, desde la creación de usuarios y el cifrado de contraseñas hasta el manejo de sesiones seguras y protección de rutas mediante middlewares personalizados y cookies seguras.
 
 [Nuxt - Prisma](https://www.prisma.io/docs/guides/frameworks/nuxt)
 
 Puntualmente veremos:
 
-Creación de endpoints en el servidor con parámetros de query.
+Creación de esquema y semilla de usuarios
 
-Configuración del modelo de producto y generación de datos semilla.
+Hash de contraseñas con una sola vía
 
-Implementación de composables personalizados para productos.
+Creación de endpoint de inicio de sesión (login)
 
-Manejo de parámetros de query reactivos y filtrado dinámico.
+Configuración y uso de Nuxt Auth
 
-Desarrollo de un componente de paginación completo.
+Creación de un composable personalizado useAuthentication
 
-Uso de TanStack Table con NuxtUI para renderizar tablas dinámicas.
+Manejo de cookies seguras de sesión
 
-Creación de endpoints con slug (producto y sugerencias).
+Consumo de información del usuario autenticado
 
-Uso de useFetch y useLazyFetch para obtener datos del servidor.
+Implementación de middlewares de ruta
 
-Implementación de un componente perezoso para sugerencias.
+Creación del NotAuthenticated Middleware
 
-Organización y entrega del código fuente final de la sección.
+Ajustes finales del flujo de inicio de sesión
