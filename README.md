@@ -1,29 +1,25 @@
-En esta sección aprenderás a conectar tu aplicación Nuxt con una base de datos PostgreSQL, utilizando el sistema de Server API routes de Nuxt para construir un backend dentro del mismo proyecto. 
+En esta sección se trabaja con endpoints del servidor en Nuxt para manejar datos dinámicos, parámetros de query, paginación y comunicación entre el backend y los composables del frontend. También se integran tablas y componentes perezosos.
 
 [Nuxt - Prisma](https://www.prisma.io/docs/guides/frameworks/nuxt)
 
-Implementaremos Prisma como ORM, aprovisionaremos la base de datos en la nube, crearemos modelos, endpoints y realizaremos una semilla inicial. Esta sección marca la transición hacia un proyecto de aplicación full-stack con Nuxt.
-
-
-
 Puntualmente veremos:
 
-Server API en Nuxt
+Creación de endpoints en el servidor con parámetros de query.
 
-Endpoints server/api/*
+Configuración del modelo de producto y generación de datos semilla.
 
-Variables de entorno
+Implementación de composables personalizados para productos.
 
-PostgreSQL en la nube (NeonTech)
+Manejo de parámetros de query reactivos y filtrado dinámico.
 
-Prisma ORM
+Desarrollo de un componente de paginación completo.
 
-Modelado de datos
+Uso de TanStack Table con NuxtUI para renderizar tablas dinámicas.
 
-Migraciones
+Creación de endpoints con slug (producto y sugerencias).
 
-Seeds (semilla de datos)
+Uso de useFetch y useLazyFetch para obtener datos del servidor.
 
-Consultas desde el servidor
+Implementación de un componente perezoso para sugerencias.
 
-Renderizado de datos en páginas Nuxt
+Organización y entrega del código fuente final de la sección.
