@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@nuxt/image",
     "@nuxt/ui",
+    "nuxt-auth-utils",
   ],
   // additional config
   vite: {
