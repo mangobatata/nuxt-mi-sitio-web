@@ -1,98 +1,192 @@
 <script setup lang="ts">
-import { h, resolveComponent } from 'vue';
-import type { TableColumn } from '@nuxt/ui';
-const UBadge = resolveComponent('UBadge');
-type Payment = {
-  id: string;
-  date: string;
-  status: 'paid' | 'failed' | 'refunded';
-  email: string;
-  amount: number;
-};
-const data = ref<Payment[]>([
+// Importamos `h` y `resolveComponent` desde Vue.
+//
+// h:
+// Sirve para crear elementos o componentes de forma programática.
+// En este caso lo usamos dentro de las columnas de la tabla.
+//
+// resolveComponent:
+// Sirve para obtener un componente registrado globalmente.
+// Acá lo usamos para poder usar UBadge dentro de una función `cell`.
+import { h, resolveComponent } from "vue";
+
+// Importamos el tipo TableColumn desde Nuxt UI.
+// Esto ayuda a TypeScript a saber cómo debe ser la estructura de las columnas.
+import type { TableColumn } from "@nuxt/ui";
+
+// Importamos una función utilitaria para formatear fechas.
+// Por ejemplo: convertir una fecha ISO en formato día/mes/año.
+import { dayMonthYearFormat } from "@@/shared/utils/date-formats";
+
+// Obtenemos el componente UBadge para poder renderizarlo dentro de la tabla.
+// Como estamos dentro de una función `cell`, no podemos usar <UBadge> directamente,
+// entonces lo resolvemos con resolveComponent.
+const UBadge = resolveComponent("UBadge");
+
+// Usamos nuestro composable personalizado para traer productos paginados.
+//
+// products:
+// Lista de productos que viene desde la API.
+//
+// currentPage:
+// Página actual.
+//
+// perPage:
+// Cantidad de productos por página.
+//
+// total:
+// Total de productos disponibles.
+const { products, currentPage, perPage, total } = await usePaginatedProducts();
+
+// Definimos las columnas que tendrá la tabla.
+// `TableColumn<Product>[]` significa que estas columnas pertenecen
+// a una tabla donde cada fila representa un producto.
+const columns: TableColumn<Product>[] = [
   {
-    id: '4600',
-    date: '2024-03-11T15:30:00',
-    status: 'paid',
-    email: 'james.anderson@example.com',
-    amount: 594,
+    // accessorKey indica qué propiedad del producto se va a mostrar.
+    // En este caso, usamos el campo `id`.
+    accessorKey: "id",
+
+    // Texto que aparece en el encabezado de la columna.
+    header: "#",
+
+    // Función que define cómo se muestra el valor dentro de cada celda.
+    // row.getValue("id") obtiene el id del producto actual.
+    cell: ({ row }) => `#${row.getValue("id")}`,
   },
+
+  // Columna de imagen del producto
   {
-    id: '4599',
-    date: '2024-03-11T10:10:00',
-    status: 'failed',
-    email: 'mia.white@example.com',
-    amount: 276,
-  },
-  {
-    id: '4598',
-    date: '2024-03-11T08:50:00',
-    status: 'refunded',
-    email: 'william.brown@example.com',
-    amount: 315,
-  },
-  {
-    id: '4597',
-    date: '2024-03-10T19:45:00',
-    status: 'paid',
-    email: 'emma.davis@example.com',
-    amount: 529,
-  },
-  {
-    id: '4596',
-    date: '2024-03-10T15:55:00',
-    status: 'paid',
-    email: 'ethan.harris@example.com',
-    amount: 639,
-  },
-]);
-const columns: TableColumn<Payment>[] = [
-  {
-    accessorKey: 'id',
-    header: '#',
-    cell: ({ row }) => `#${row.getValue('id')}`,
-  },
-  {
-    accessorKey: 'date',
-    header: 'Date',
+    // Esta columna usa el campo `images`, que normalmente es un array de URLs.
+    accessorKey: "images",
+
+    // Título de la columna.
+    header: "Imagen",
+
+    // Render personalizado para la celda.
     cell: ({ row }) => {
-      return new Date(row.getValue('date')).toLocaleString('en-US', {
-        day: 'numeric',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
+      // Obtenemos el valor de images desde la fila actual.
+      // Lo convertimos a string[] porque esperamos un array de imágenes.
+      const images = row.getValue("images") as string[];
+
+      // Si images es un array y tiene al menos una imagen,
+      // usamos la primera imagen como imagen principal.
+      const url = Array.isArray(images) && images.length > 0 ? images[0] : "";
+
+      // Si no hay imagen, mostramos un texto simple.
+      if (!url)
+        return h(
+          "span",
+          {
+            class: "text-gray-500",
+          },
+          "Sin imagen",
+        );
+
+      // Si hay imagen, renderizamos una etiqueta <img>.
+      // Usamos `h` porque estamos generando el contenido desde JavaScript.
+      return h("img", {
+        src: url,
+        alt: "Imagen del producto",
+        style:
+          "width: 48px; height: 48px; object-fit: cover; border-radius: 0.5rem",
       });
     },
   },
+
   {
-    accessorKey: 'status',
-    header: 'Status',
+    // Columna para mostrar el nombre del producto.
+    accessorKey: "name",
+    header: "Nombre",
+
+    // Obtenemos el valor del campo `name` y lo mostramos.
+    cell: ({ row }) => row.getValue("name"),
+  },
+
+  {
+    // Columna para mostrar la descripción del producto.
+    accessorKey: "description",
+    header: "Descripción",
+
     cell: ({ row }) => {
-      const color = {
-        paid: 'success' as const,
-        failed: 'error' as const,
-        refunded: 'neutral' as const,
-      }[row.getValue('status') as string];
-      return h(UBadge, { class: 'capitalize', variant: 'subtle', color }, () =>
-        row.getValue('status')
+      // Creamos un div para mostrar la descripción.
+      // Se limita visualmente para que no ocupe demasiado espacio en la tabla.
+      return h(
+        "div",
+        {
+          style:
+            "white-space: normal; word-break: break-word; max-width: 300px;",
+          class: "truncate-text",
+        },
+
+        // Convertimos la descripción a string,
+        // cortamos los primeros 50 caracteres
+        // y agregamos "..." al final.
+        String(row.getValue("description")).slice(0, 50) + "...",
       );
     },
   },
+
   {
-    accessorKey: 'email',
-    header: 'Email',
+    // Columna para mostrar el precio.
+    accessorKey: "price",
+    header: "Precio",
+
+    // Obtenemos el precio y lo formateamos con formatCurrency.
+    // Ejemplo: 100 => $100.00 o Gs. 100, según tu configuración.
+    cell: ({ row }) => formatCurrency(row.getValue("price")),
   },
+
   {
-    accessorKey: 'amount',
-    header: () => h('div', { class: 'text-right' }, 'Amount'),
+    // Columna para mostrar las etiquetas del producto.
+    accessorKey: "tags",
+    header: "Etiquetas",
+
     cell: ({ row }) => {
-      const amount = Number.parseFloat(row.getValue('amount'));
-      const formatted = new Intl.NumberFormat('es-MX', {
-        style: 'currency',
-        currency: 'MXN',
-      }).format(amount);
-      return h('div', { class: 'text-right font-medium' }, formatted);
+      // Obtenemos el array de tags desde la fila actual.
+      const tags = row.getValue("tags") as string[];
+
+      // Si tags no es un array, no mostramos nada.
+      if (!Array.isArray(tags)) return "";
+
+      // Creamos un contenedor div para mostrar varios badges.
+      return h(
+        "div",
+        { class: "flex flex-wrap gap-1" },
+
+        // Recorremos cada tag y creamos un UBadge para cada uno.
+        tags.map((tag) =>
+          h(
+            UBadge,
+            {
+              size: "xs",
+              color: "primary",
+              variant: "subtle",
+              class: "mr-0.5",
+            },
+
+            // Contenido del badge.
+            () => tag,
+          ),
+        ),
+      );
+    },
+  },
+
+  {
+    // Columna para mostrar la fecha de creación del producto.
+    accessorKey: "createdAt",
+    header: "Creado",
+
+    cell: ({ row }) => {
+      // Obtenemos el valor de createdAt.
+      const value = row.getValue("createdAt");
+
+      // Si existe una fecha, la convertimos a Date
+      // y luego la formateamos con dayMonthYearFormat.
+      //
+      // Si no existe, mostramos un string vacío.
+      return value ? dayMonthYearFormat(new Date(value as string)) : "";
     },
   },
 ];
@@ -118,6 +212,12 @@ const columns: TableColumn<Payment>[] = [
       />
     </div>
 
-    <UTable :data="data" :columns="columns" class="flex-1" />
+    <UTable :data="products" :columns="columns" class="flex-1" />
+
+    <SharedPagination
+      :total="total"
+      :model-value="currentPage"
+      :per-page="perPage"
+    />
   </div>
 </template>
