@@ -17,7 +17,14 @@ export default defineEventHandler(async (event) => {
   if (!product) {
     throw createError({
       statusCode: 404,
-      statusMessage: "Producto no encontrado",
+      statusMessage: "Not Found",
+      message: `Product with slug ${slug} not found`,
+      data: {
+        slug,
+        state: process.env.STAGE,
+      },
+
+      stack: process.env.STAGE !== "prod" ? new Error().stack : "",
     });
   }
 
