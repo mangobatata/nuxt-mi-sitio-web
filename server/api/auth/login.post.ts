@@ -1,6 +1,7 @@
 import { z } from "zod";
 import prisma from "@@/lib/prisma";
 import argon2 from "argon2";
+import { assertRateLimit } from "../../utils/rate-limit";
 
 const bodySchema = z.object({
   email: z
@@ -14,6 +15,12 @@ const bodySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  assertRateLimit(event, "auth:login", {
+    maxRequests: 10,
+    windowMs: 15 * 60 * 1000,
+    message: "Too many login attempts. Please try again later.",
+  });
+
   const { email, password } = await readValidatedBody(event, bodySchema.parse);
 
   const user = await prisma.user.findUnique({
