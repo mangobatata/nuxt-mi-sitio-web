@@ -32,3 +32,5 @@ logs
 /lib/generated/prisma
 
 /app/generated/prisma
+
+generated/prisma
