@@ -221,6 +221,7 @@ const columns: TableColumn<Product>[] = [
         </p>
       </div>
       <UButton
+        to="/dashboard/product/new"
         icon="i-lucide-plus"
         label="Agregar Producto"
         color="primary"
