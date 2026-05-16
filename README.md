@@ -1,25 +1,27 @@
-En esta sección aprenderás a implementar un sistema completo de autenticación y autorización en Nuxt, desde la creación de usuarios y el cifrado de contraseñas hasta el manejo de sesiones seguras y protección de rutas mediante middlewares personalizados y cookies seguras.
+En esta sección llevas el proyecto al siguiente nivel integrando endpoints avanzados del server, validaciones, middlewares, formularios con "form-multipart" y manejo de creación/edición de productos dentro de Nuxt.
+
+No usaremos ningún paquete adicional para el manejo de formularios ni carga de archivos.
 
 [Nuxt - Prisma](https://www.prisma.io/docs/guides/frameworks/nuxt)
 
 Puntualmente veremos:
 
-Creación de esquema y semilla de usuarios
+Validación de sesión en APIs
 
-Hash de contraseñas con una sola vía
+Middlewares del Server API
 
-Creación de endpoint de inicio de sesión (login)
+Componentes dinámicos con TanStack Table
 
-Configuración y uso de Nuxt Auth
+Composable para crear/editar productos
 
-Creación de un composable personalizado useAuthentication
+Pantalla de creación y edición
 
-Manejo de cookies seguras de sesión
+Validación de formularios
 
-Consumo de información del usuario autenticado
+Endpoints PATCH con Form-Multipart
 
-Implementación de middlewares de ruta
+Mensajes de actualización
 
-Creación del NotAuthenticated Middleware
+Creación de producto (forma tradicional)
 
-Ajustes finales del flujo de inicio de sesión
+Lectura de parámetros de query

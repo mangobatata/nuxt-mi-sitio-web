@@ -23,6 +23,8 @@ import { dayMonthYearFormat } from "@@/shared/utils/date-formats";
 // entonces lo resolvemos con resolveComponent.
 const UBadge = resolveComponent("UBadge");
 
+const NuxtLink = resolveComponent("NuxtLink");
+
 // Usamos nuestro composable personalizado para traer productos paginados.
 //
 // products:
@@ -100,7 +102,21 @@ const columns: TableColumn<Product>[] = [
     header: "Nombre",
 
     // Obtenemos el valor del campo `name` y lo mostramos.
-    cell: ({ row }) => row.getValue("name"),
+    cell: ({ row }) => {
+      const productName = row.getValue("name");
+      const productId = row.getValue("id");
+
+      return h(
+        NuxtLink,
+        {
+          to: `/dashboard/product/${productId}`,
+
+          class:
+            "inline-flex items-center rounded-xl border border-indigo-100 bg-indigo-50/80 px-3 py-1.5 text-sm font-medium text-indigo-700 backdrop-blur transition hover:bg-indigo-100",
+        },
+        () => productName,
+      );
+    },
   },
 
   {
