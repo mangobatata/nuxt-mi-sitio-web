@@ -2,7 +2,7 @@
 import type { NavigationMenuItem } from "#ui/components/NavigationMenu.vue";
 
 const route = useRoute();
-const { isLoggedIn, logout } = useAuthentication();
+const { isLoggedIn, logout, isAdmin } = useAuthentication();
 
 const items = computed<NavigationMenuItem[]>(() => [
   {
@@ -57,6 +57,19 @@ const responsiveMenu = computed<NavigationMenuItem[]>(() => [
     </template>
 
     <UNavigationMenu :items="items" />
+
+    <!-- Solución Real  -->
+    <ClientOnly>
+      <UNavigationMenu
+        v-if="isAdmin"
+        :items="[
+          {
+            label: 'Dashboard',
+            to: '/dashboard',
+          },
+        ]"
+      />
+    </ClientOnly>
 
     <template #right>
       <UColorModeButton />
