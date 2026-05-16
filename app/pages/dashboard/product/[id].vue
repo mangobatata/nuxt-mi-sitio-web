@@ -8,7 +8,7 @@ const toast = useToast();
 const messageQuery = route.query.message as string;
 if (messageQuery) {
   toast.add({
-    title: 'Producto creado',
+    title: "Producto creado",
     description: messageQuery,
   });
   router.replace({ query: {} });
@@ -34,7 +34,7 @@ const newProduct = ref<Product | null>(
 const selectedImageIndex = ref(0);
 const isSubmitting = ref(false);
 const fieldErrors = ref<Record<string, string>>({});
-const isCreating = computed(() => rawId === 'new');
+const isCreating = computed(() => rawId === "new");
 
 const pageTitle = computed(() =>
   isCreating.value ? "Crear producto" : "Editar producto",
@@ -45,21 +45,59 @@ const subtitle = computed(() =>
     : "Actualiza la in formación del producto seleccionado",
 );
 
+const productSchema = z.object({
+  slug: z.string().nonempty("El Slug es requerido"),
+  name: z.string().nonempty("El nombre es requerido"),
+  description: z.string().nonempty("La descripción es requerida"),
+  price: z.number().min(0, "El precio es requerido"),
+});
 
-const handleSubmit = async () => {}
+const checkValidations = () => {
+  fieldErrors.value = {};
+
+  const result = productSchema.safeParse(newProduct.value);
+
+  if (!result.success) {
+    result.error.issues.forEach((issue) => {
+      const field = issue.path[0];
+
+      if (typeof field === "string") {
+        fieldErrors.value[field] = issue.message;
+      }
+    });
+
+    return false;
+  }
+
+  // Si quieres, aquí puedes sobreescribir newProduct con los valores parseados
+  // newProduct.value = result.data;
+
+  return true;
+};
+
+const handleSubmit = async () => {
+  const isFormValid = checkValidations();
+  if (!isFormValid) return;
+  if (!newProduct.value) return;
+
+  newProduct.value!.tags = `${newProduct.value!.tags}`.split(",");
+
+  console.log(newProduct.value);
+  const product = await createOrUpdate(newProduct.value);
+};
 
 const handleCancel = () => {
-  navigateTo('/dashboard/products');
+  navigateTo("/dashboard/products");
 };
 
 watch(
   newProduct,
   () => {
-    // checkValidations();
+    checkValidations();
   },
   {
     deep: true,
-  }
+  },
 );
 </script>
 
