@@ -1,27 +1,33 @@
-En esta sección llevas el proyecto al siguiente nivel integrando endpoints avanzados del server, validaciones, middlewares, formularios con "form-multipart" y manejo de creación/edición de productos dentro de Nuxt.
-
-No usaremos ningún paquete adicional para el manejo de formularios ni carga de archivos.
+En esta sección aprenderás a integrar y manejar la carga de archivos en tu proyecto, desde la preparación del espacio de almacenamiento en Cloudinary hasta el envío, recepción, limpieza y visualización local de las imágenes. Una sección práctica centrada en flujo real de archivos.
 
 [Nuxt - Prisma](https://www.prisma.io/docs/guides/frameworks/nuxt)
 
 Puntualmente veremos:
 
-Validación de sesión en APIs
+Preparar almacenamiento en Cloudinary
 
-Middlewares del Server API
+Configuración del espacio y credenciales necesarias.
 
-Componentes dinámicos con TanStack Table
+Función de carga de archivos
 
-Composable para crear/editar productos
+Creación de una función reutilizable para manejar uploads.
 
-Pantalla de creación y edición
+Envío y recepción de archivos
 
-Validación de formularios
+Implementación del backend y frontend para subir y recibir archivos.
 
-Endpoints PATCH con Form-Multipart
+Subir archivos a Cloudinary
 
-Mensajes de actualización
+Conexión directa con Cloudinary usando su SDK.
 
-Creación de producto (forma tradicional)
+Limpieza de archivos temporales
 
-Lectura de parámetros de query
+Eliminación de imágenes o archivos locales después de procesarlos.
+
+Mostrar vistas previas locales
+
+Visualizar archivos antes de enviarlos a almacenamiento remoto.
+
+(Opcional) Migrar pnpm a yarn
+
+Alternativa de gestor de paquetes para quien lo prefiera.
