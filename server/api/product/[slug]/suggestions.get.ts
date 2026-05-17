@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   await new Promise((resolve) => setTimeout(resolve, 2500));
 
-  if (!product) {
+  if (!product || product.status !== "active") {
     throw createError({
       statusCode: 404,
       statusMessage: 'Not Found',
@@ -30,6 +30,7 @@ export default defineEventHandler(async (event) => {
       tags: {
         hasSome: product.tags,
       },
+      status: "active",
       NOT: {
         id: product.id,
       },

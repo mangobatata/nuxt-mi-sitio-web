@@ -52,6 +52,7 @@ const bodySchema = z.object({
   tags: z
     .array(z.string().min(1, "Cada tag debe tener al menos un carácter."))
     .optional(),
+  status: z.enum(["draft", "active", "archived"]).default("draft"),
 });
 
 // ─── Tipo inferido del schema ──────────────────────────────────────────────
@@ -194,7 +195,20 @@ export default defineEventHandler(async (event) => {
 
   // 3. Crear el producto en la base de datos
   const product = await prisma.product.create({
-    data: productData,
+    data: {
+      ...productData,
+      changes: {
+        create: {
+          productName: body.name,
+          action: "created",
+          changes: {
+            status: body.status,
+            slug: body.slug,
+            name: body.name,
+          },
+        },
+      },
+    },
   });
 
   // 4. Responder con 201 Created y el producto creado

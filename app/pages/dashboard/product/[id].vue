@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import security from "@comark/nuxt/plugins/security";
 import { z } from "zod";
 
 const router = useRouter();
@@ -10,6 +11,18 @@ const filesToUploadPreviews = ref<string[]>([]);
 const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 const maxFilesToUpload = 5;
 const isDraggingImages = ref(false);
+const isPreviewVisible = ref(false);
+const slugWasEdited = ref(false);
+const markdownPlugins = [
+  security({
+    blockedTags: ["script", "style", "iframe", "object", "embed"],
+  }),
+];
+const productStatusOptions = [
+  { label: "Borrador", value: "draft" },
+  { label: "Activo", value: "active" },
+  { label: "Archivado", value: "archived" },
+];
 
 const messageQuery = route.query.message as string;
 if (messageQuery) {
@@ -37,6 +50,12 @@ if (error.value) {
 const newProduct = ref<Product | null>(
   structuredClone(product.value) as Product,
 );
+const { data: productHistory, refresh: refreshHistory } = await useFetch<
+  ProductChange[]
+>(`/api/admin/product/${rawId}/history`, {
+  immediate: rawId !== "new",
+  default: () => [],
+});
 const selectedImageIndex = ref(0);
 const isSubmitting = ref(false);
 const fieldErrors = ref<Record<string, string>>({});
@@ -62,7 +81,43 @@ const productSchema = z.object({
       "La descripción debe escribirse en Markdown, no en HTML",
     ),
   price: z.number().min(0, "El precio es requerido"),
+  status: z.enum(["draft", "active", "archived"]),
 });
+
+const slugify = (value: string) =>
+  value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const handleSlugInput = () => {
+  slugWasEdited.value = true;
+};
+
+const previewTags = computed(() => {
+  if (!newProduct.value) return [];
+  if (Array.isArray(newProduct.value.tags)) return newProduct.value.tags;
+
+  return `${newProduct.value.tags}`
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+});
+
+const selectedImage = computed(() => {
+  if (!newProduct.value) return "";
+  return (
+    newProduct.value.images[selectedImageIndex.value] ??
+    filesToUploadPreviews.value[0] ??
+    ""
+  );
+});
+
+const formatChangeDetails = (changes: Record<string, unknown>) =>
+  JSON.stringify(changes, null, 2);
 
 const checkValidations = () => {
   fieldErrors.value = {};
@@ -114,6 +169,7 @@ const handleSubmit = async () => {
 
     newProduct.value = structuredClone(product) as Product;
     clearSelectedFiles();
+    await refreshHistory();
 
     toast.add({
       title: "Producto actualizado correctamente",
@@ -147,6 +203,28 @@ const removeFilePreview = (index: number) => {
   const [preview] = filesToUploadPreviews.value.splice(index, 1);
   if (preview) URL.revokeObjectURL(preview);
   filesToUpload.value.splice(index, 1);
+};
+
+const removeExistingImage = (index: number) => {
+  if (!newProduct.value) return;
+  newProduct.value.images.splice(index, 1);
+  selectedImageIndex.value = Math.max(
+    0,
+    Math.min(selectedImageIndex.value, newProduct.value.images.length - 1),
+  );
+};
+
+const moveExistingImage = (index: number, direction: -1 | 1) => {
+  if (!newProduct.value) return;
+
+  const nextIndex = index + direction;
+  if (nextIndex < 0 || nextIndex >= newProduct.value.images.length) return;
+
+  const [image] = newProduct.value.images.splice(index, 1);
+  if (!image) return;
+
+  newProduct.value.images.splice(nextIndex, 0, image);
+  selectedImageIndex.value = nextIndex;
 };
 
 const addFilesToUpload = (selectedFiles: File[]) => {
@@ -206,6 +284,14 @@ watch(
     deep: true,
   },
 );
+
+watch(
+  () => newProduct.value?.name,
+  (name) => {
+    if (!newProduct.value || slugWasEdited.value || !isCreating.value) return;
+    newProduct.value.slug = slugify(name ?? "");
+  },
+);
 </script>
 
 <template>
@@ -255,6 +341,7 @@ watch(
               ]"
               placeholder="ejemplo-producto"
               autocomplete="off"
+              @input="handleSlugInput"
             />
             <p v-if="fieldErrors.slug" class="text-sm text-red-600">
               {{ fieldErrors.slug }}
@@ -322,6 +409,28 @@ watch(
             <div class="space-y-2">
               <label
                 class="text-sm font-medium text-gray-700 dark:text-gray-200"
+                for="product-status"
+              >
+                Estado
+              </label>
+              <select
+                id="product-status"
+                v-model="newProduct.status"
+                class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+              >
+                <option
+                  v-for="status in productStatusOptions"
+                  :key="status.value"
+                  :value="status.value"
+                >
+                  {{ status.label }}
+                </option>
+              </select>
+            </div>
+
+            <div class="space-y-2">
+              <label
+                class="text-sm font-medium text-gray-700 dark:text-gray-200"
                 for="product-price"
               >
                 Precio (entero)
@@ -386,31 +495,62 @@ watch(
                 class="overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800"
               >
                 <img
-                  :src="newProduct.images[selectedImageIndex]"
+                  :src="selectedImage"
                   alt="Previsualización principal del producto"
                   class="h-64 w-full object-cover"
                 />
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <button
+                <div
                   v-for="(image, index) in newProduct.images"
                   :key="image + index"
-                  type="button"
-                  class="overflow-hidden rounded-md border-2 transition"
+                  class="group relative overflow-hidden rounded-md border-2 transition"
                   :class="
                     selectedImageIndex === index
                       ? 'border-blue-500'
                       : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600'
                   "
-                  @click="selectedImageIndex = index"
                 >
-                  <img
-                    :src="image"
-                    :alt="`Previsualización ${index + 1}`"
-                    class="h-20 w-full object-cover"
-                    loading="lazy"
-                  />
-                </button>
+                  <button type="button" class="block w-full" @click="selectedImageIndex = index">
+                    <img
+                      :src="image"
+                      :alt="`Previsualización ${index + 1}`"
+                      class="h-20 w-full object-cover"
+                      loading="lazy"
+                    />
+                  </button>
+                  <div class="absolute inset-x-1 bottom-1 flex justify-center gap-1 opacity-0 transition group-hover:opacity-100">
+                    <UButton
+                      type="button"
+                      icon="i-lucide-arrow-left"
+                      color="neutral"
+                      variant="solid"
+                      size="xs"
+                      square
+                      :disabled="index === 0"
+                      @click="moveExistingImage(index, -1)"
+                    />
+                    <UButton
+                      type="button"
+                      icon="i-lucide-arrow-right"
+                      color="neutral"
+                      variant="solid"
+                      size="xs"
+                      square
+                      :disabled="index === newProduct.images.length - 1"
+                      @click="moveExistingImage(index, 1)"
+                    />
+                    <UButton
+                      type="button"
+                      icon="i-lucide-trash-2"
+                      color="error"
+                      variant="solid"
+                      size="xs"
+                      square
+                      @click="removeExistingImage(index)"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <!-- <textarea
@@ -496,6 +636,15 @@ watch(
 
         <div class="flex flex-wrap items-center gap-3">
           <UButton
+            type="button"
+            color="neutral"
+            variant="soft"
+            icon="i-lucide-eye"
+            @click="isPreviewVisible = !isPreviewVisible"
+          >
+            {{ isPreviewVisible ? "Ocultar preview" : "Preview del producto" }}
+          </UButton>
+          <UButton
             type="submit"
             color="primary"
             variant="solid"
@@ -515,6 +664,72 @@ watch(
           </UButton>
         </div>
       </form>
+
+      <section
+        v-if="isPreviewVisible"
+        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900"
+      >
+        <div class="grid gap-6 lg:grid-cols-[280px_1fr]">
+          <div class="overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
+            <img
+              v-if="selectedImage"
+              :src="selectedImage"
+              :alt="newProduct.name"
+              class="h-72 w-full object-cover"
+            />
+            <div
+              v-else
+              class="flex h-72 items-center justify-center text-sm text-gray-500 dark:text-gray-400"
+            >
+              Sin imagen
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                  {{ newProduct.name || "Nombre del producto" }}
+                </h2>
+                <UBadge
+                  :color="newProduct.status === 'active' ? 'success' : newProduct.status === 'archived' ? 'neutral' : 'warning'"
+                  variant="subtle"
+                >
+                  {{
+                    productStatusOptions.find(
+                      (status) => status.value === newProduct.status,
+                    )?.label
+                  }}
+                </UBadge>
+              </div>
+              <p class="text-xl font-semibold text-primary-600">
+                {{ formatCurrency(newProduct.price || 0) }}
+              </p>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <UBadge
+                v-for="tag in previewTags"
+                :key="tag"
+                color="primary"
+                variant="subtle"
+              >
+                {{ tag }}
+              </UBadge>
+            </div>
+
+            <div class="markdown-content leading-relaxed">
+              <Comark
+                v-if="newProduct.description.trim()"
+                :markdown="newProduct.description"
+                :plugins="markdownPlugins"
+              />
+              <p v-else class="text-sm text-gray-500 dark:text-gray-400">
+                Sin descripción.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section
         v-if="!isCreating && product"
@@ -541,6 +756,35 @@ watch(
             </dd>
           </div>
         </dl>
+      </section>
+
+      <section
+        v-if="!isCreating"
+        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900"
+      >
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+          Historial de cambios
+        </h2>
+        <div v-if="productHistory?.length" class="mt-4 space-y-3">
+          <div
+            v-for="entry in productHistory"
+            :key="entry.id"
+            class="rounded-md border border-gray-200 p-3 dark:border-gray-800"
+          >
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <UBadge variant="subtle" color="neutral">
+                {{ entry.action }}
+              </UBadge>
+              <span class="text-sm text-gray-500 dark:text-gray-400">
+                {{ longDateTimeFormat(new Date(entry.createdAt)) }}
+              </span>
+            </div>
+            <pre class="mt-2 overflow-x-auto rounded bg-gray-50 p-2 text-xs text-gray-700 dark:bg-gray-950 dark:text-gray-300">{{ formatChangeDetails(entry.changes) }}</pre>
+          </div>
+        </div>
+        <p v-else class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+          Sin cambios registrados todavía.
+        </p>
       </section>
     </div>
   </div>

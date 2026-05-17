@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
 
   const product = await prisma.product.findUnique({
     where: { id },
-    select: { id: true, name: true },
+    select: { id: true, name: true, slug: true, status: true },
   });
 
   if (!product) {
@@ -36,9 +36,22 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  await prisma.product.delete({
-    where: { id },
-  });
+  await prisma.$transaction([
+    prisma.productChange.create({
+      data: {
+        productId: id,
+        productName: product.name,
+        action: "deleted",
+        changes: {
+          slug: product.slug,
+          status: product.status,
+        },
+      },
+    }),
+    prisma.product.delete({
+      where: { id },
+    }),
+  ]);
 
   setResponseStatus(event, 200);
 

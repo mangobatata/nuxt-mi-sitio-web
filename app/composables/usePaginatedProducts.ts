@@ -1,7 +1,14 @@
 // En Vue, computed sirve para crear un valor calculado reactivo.
 // Es decir: Vue calcula un valor a partir de otros datos, y cuando esos datos cambian, el computed se actualiza automáticamente.
 
-export const usePaginatedProducts = async () => {
+export const usePaginatedProducts = async (
+  options: {
+    search?: Ref<string>;
+    status?: Ref<string>;
+    sortBy?: Ref<string>;
+    sortOrder?: Ref<"asc" | "desc">;
+  } = {},
+) => {
   // Obtenemos la ruta actual.
   // Esto nos permite leer los query params de la URL.
   // Ejemplo: /products?page=2&limit=20
@@ -34,6 +41,11 @@ export const usePaginatedProducts = async () => {
     return (page.value - 1) * limit.value;
   });
 
+  const search = computed(() => options.search?.value ?? "");
+  const statusFilter = computed(() => options.status?.value ?? "all");
+  const sortBy = computed(() => options.sortBy?.value ?? "createdAt");
+  const sortOrder = computed(() => options.sortOrder?.value ?? "desc");
+
   // Hacemos la petición a la API de productos.
   // Le enviamos limit y offset como query params.
   //
@@ -48,10 +60,14 @@ export const usePaginatedProducts = async () => {
 
         // Cantidad de productos que se deben saltar
         offset,
+        search,
+        status: statusFilter,
+        sortBy,
+        sortOrder,
       },
 
       // Cuando cambie page o limit, Nuxt vuelve a ejecutar la petición.
-      watch: [page, limit],
+      watch: [page, limit, search, statusFilter, sortBy, sortOrder],
     },
   );
 

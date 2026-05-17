@@ -29,6 +29,22 @@ const NuxtLink = resolveComponent("NuxtLink");
 
 const toast = useToast();
 const deletingProductId = ref<number | null>(null);
+const search = ref("");
+const statusFilter = ref("all");
+const sortBy = ref("createdAt");
+const sortOrder = ref<"asc" | "desc">("desc");
+const statusOptions = [
+  { label: "Todos", value: "all" },
+  { label: "Borrador", value: "draft" },
+  { label: "Activo", value: "active" },
+  { label: "Archivado", value: "archived" },
+];
+const sortOptions = [
+  { label: "Fecha de creación", value: "createdAt" },
+  { label: "Fecha de actualización", value: "updatedAt" },
+  { label: "Nombre", value: "name" },
+  { label: "Precio", value: "price" },
+];
 
 // Usamos nuestro composable personalizado para traer productos paginados.
 //
@@ -43,8 +59,13 @@ const deletingProductId = ref<number | null>(null);
 //
 // total:
 // Total de productos disponibles.
-const { products, currentPage, perPage, total, execute } =
-  await usePaginatedProducts();
+const { products, currentPage, perPage, total, execute, pending } =
+  await usePaginatedProducts({
+    search,
+    status: statusFilter,
+    sortBy,
+    sortOrder,
+  });
 
 const deleteProduct = async (product: Product) => {
   if (deletingProductId.value) return;
@@ -195,6 +216,31 @@ const columns: TableColumn<Product>[] = [
   },
 
   {
+    accessorKey: "status",
+    header: "Estado",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as Product["status"];
+      const label =
+        statusOptions.find((option) => option.value === status)?.label ??
+        status;
+
+      return h(
+        UBadge,
+        {
+          color:
+            status === "active"
+              ? "success"
+              : status === "archived"
+                ? "neutral"
+                : "warning",
+          variant: "subtle",
+        },
+        () => label,
+      );
+    },
+  },
+
+  {
     // Columna para mostrar las etiquetas del producto.
     accessorKey: "tags",
     header: "Etiquetas",
@@ -248,6 +294,16 @@ const columns: TableColumn<Product>[] = [
   },
 
   {
+    accessorKey: "updatedAt",
+    header: "Actualizado",
+
+    cell: ({ row }) => {
+      const value = row.getValue("updatedAt");
+      return value ? dayMonthYearFormat(new Date(value as string)) : "";
+    },
+  },
+
+  {
     id: "actions",
     header: "Acciones",
     cell: ({ row }) => {
@@ -295,7 +351,74 @@ const columns: TableColumn<Product>[] = [
       />
     </div>
 
-    <UTable :data="products" :columns="columns" class="flex-1" />
+    <div
+      class="grid gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:grid-cols-[1fr_180px_200px_150px] dark:border-gray-700 dark:bg-gray-900"
+    >
+      <div class="space-y-1">
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+          Buscar
+        </label>
+        <input
+          v-model="search"
+          type="search"
+          class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+          placeholder="Nombre, slug, descripción o tag"
+        />
+      </div>
+      <div class="space-y-1">
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+          Estado
+        </label>
+        <select
+          v-model="statusFilter"
+          class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+        >
+          <option
+            v-for="option in statusOptions"
+            :key="option.value"
+            :value="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+      <div class="space-y-1">
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+          Ordenar por
+        </label>
+        <select
+          v-model="sortBy"
+          class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+        >
+          <option
+            v-for="option in sortOptions"
+            :key="option.value"
+            :value="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+      <div class="space-y-1">
+        <label class="text-sm font-medium text-gray-700 dark:text-gray-200">
+          Dirección
+        </label>
+        <select
+          v-model="sortOrder"
+          class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+        >
+          <option value="desc">Descendente</option>
+          <option value="asc">Ascendente</option>
+        </select>
+      </div>
+    </div>
+
+    <UTable
+      :data="products"
+      :columns="columns"
+      :loading="pending"
+      class="flex-1"
+    />
 
     <SharedPagination
       :total="total"

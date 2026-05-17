@@ -13,6 +13,7 @@ const EMPTY_PRODUCT: Product = {
   price: 0,
   images: [],
   tags: [],
+  status: "draft",
 };
 
 // ─── Helper privado ────────────────────────────────────────────────────────

@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     where: { slug },
   });
 
-  if (!product) {
+  if (!product || product.status !== "active") {
     throw createError({
       statusCode: 404,
       statusMessage: "Not Found",

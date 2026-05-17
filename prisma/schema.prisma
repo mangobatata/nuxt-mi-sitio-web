@@ -24,8 +24,20 @@ model Product {
   price       Int
   images      String[]
   tags        String[]
+  status      String   @default("draft")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  changes     ProductChange[]
+}
+
+model ProductChange {
+  id          Int      @id @default(autoincrement())
+  productId   Int?
+  productName String
+  action      String
+  changes     Json
+  createdAt   DateTime @default(now())
+  product     Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
 }
 
 model User {

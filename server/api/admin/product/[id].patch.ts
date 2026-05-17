@@ -55,6 +55,7 @@ const bodySchema = z.object({
   tags: z
     .array(z.string().min(1, "Cada tag debe tener al menos un carácter."))
     .optional(),
+  status: z.enum(["draft", "active", "archived"]).optional(),
 });
 
 // ─── Constantes ────────────────────────────────────────────────────────────
@@ -201,7 +202,16 @@ export default defineEventHandler(async (event) => {
   // 4. Verificar que el producto exista
   const existing = await prisma.product.findUnique({
     where: { id },
-    select: { id: true, images: true }, // Traemos images para poder hacer merge
+    select: {
+      id: true,
+      slug: true,
+      name: true,
+      description: true,
+      price: true,
+      images: true,
+      tags: true,
+      status: true,
+    },
   });
 
   if (!existing) {
@@ -226,6 +236,47 @@ export default defineEventHandler(async (event) => {
     data: {
       ...body.data,
       images: mergedImages,
+      changes: {
+        create: {
+          productName: body.data.name ?? existing.name,
+          action: "updated",
+          changes: Object.fromEntries(
+            Object.entries({
+              slug:
+                body.data.slug && body.data.slug !== existing.slug
+                  ? { from: existing.slug, to: body.data.slug }
+                  : undefined,
+              name:
+                body.data.name && body.data.name !== existing.name
+                  ? { from: existing.name, to: body.data.name }
+                  : undefined,
+              description:
+                body.data.description &&
+                body.data.description !== existing.description
+                  ? { from: existing.description, to: body.data.description }
+                  : undefined,
+              price:
+                typeof body.data.price === "number" &&
+                body.data.price !== existing.price
+                  ? { from: existing.price, to: body.data.price }
+                  : undefined,
+              images:
+                JSON.stringify(mergedImages) !== JSON.stringify(existing.images)
+                  ? { from: existing.images, to: mergedImages }
+                  : undefined,
+              tags:
+                body.data.tags &&
+                JSON.stringify(body.data.tags) !== JSON.stringify(existing.tags)
+                  ? { from: existing.tags, to: body.data.tags }
+                  : undefined,
+              status:
+                body.data.status && body.data.status !== existing.status
+                  ? { from: existing.status, to: body.data.status }
+                  : undefined,
+            }).filter(([, value]) => Boolean(value)),
+          ),
+        },
+      },
     },
   });
 

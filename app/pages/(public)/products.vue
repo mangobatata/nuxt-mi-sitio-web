@@ -8,7 +8,10 @@
 //     myOtherField: 'Hola mundo',
 //   },
 // });
-const { products, total, currentPage, perPage } = await usePaginatedProducts();
+const publicStatus = ref("active");
+const { products, total, currentPage, perPage } = await usePaginatedProducts({
+  status: publicStatus,
+});
 </script>
 
 <template>
