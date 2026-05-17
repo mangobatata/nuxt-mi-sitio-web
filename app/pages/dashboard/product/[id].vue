@@ -5,6 +5,12 @@ const router = useRouter();
 const route = useRoute();
 const toast = useToast();
 
+const filesToUpload = ref<File[]>([]);
+const filesToUploadPreviews = ref<string[]>([]);
+const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+const maxFilesToUpload = 5;
+const isDraggingImages = ref(false);
+
 const messageQuery = route.query.message as string;
 if (messageQuery) {
   toast.add({
@@ -48,7 +54,13 @@ const subtitle = computed(() =>
 const productSchema = z.object({
   slug: z.string().nonempty("El Slug es requerido"),
   name: z.string().nonempty("El nombre es requerido"),
-  description: z.string().nonempty("La descripción es requerida"),
+  description: z
+    .string()
+    .nonempty("La descripción es requerida")
+    .refine(
+      (description) => !/<\/?[a-z][\s\S]*>/i.test(description),
+      "La descripción debe escribirse en Markdown, no en HTML",
+    ),
   price: z.number().min(0, "El precio es requerido"),
 });
 
@@ -80,30 +92,110 @@ const handleSubmit = async () => {
   if (!isFormValid) return;
   if (!newProduct.value) return;
 
-  newProduct.value!.tags = `${newProduct.value!.tags}`.split(",");
+  isSubmitting.value = true;
 
-  console.log(newProduct.value);
-  const product = await createOrUpdate(newProduct.value);
+  try {
+    newProduct.value.description = newProduct.value.description
+      .replace(/\r\n?/g, "\n")
+      .trim();
+    newProduct.value.tags = `${newProduct.value.tags}`
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
 
-  if (isCreating.value) {
-    // navigateTo
-    router.replace(
-      `/dashboard/product/${product.id}?message=Producto creado correctamente`,
-    );
-    return;
+    const product = await createOrUpdate(newProduct.value, filesToUpload.value);
+
+    if (isCreating.value) {
+      router.replace(
+        `/dashboard/product/${product.id}?message=Producto creado correctamente`,
+      );
+      return;
+    }
+
+    newProduct.value = structuredClone(product) as Product;
+    clearSelectedFiles();
+
+    toast.add({
+      title: "Producto actualizado correctamente",
+      description: `El producto ${product.name}, ha sido actualizado correctamente`,
+    });
+  } catch (error) {
+    toast.add({
+      title: "No se pudo guardar el producto",
+      description:
+        error instanceof Error
+          ? error.message
+          : "Revisa los datos e intenta nuevamente.",
+      color: "error",
+    });
+  } finally {
+    isSubmitting.value = false;
   }
-
-  // TODO: limpiar los archivos seleccionados
-
-  toast.add({
-    title: "Producto actualizado correctamente",
-    description: `El producto ${product.name}, ha sido actualizado correctamente`,
-  });
 };
 
 const handleCancel = () => {
   navigateTo("/dashboard/products");
 };
+
+const clearSelectedFiles = () => {
+  filesToUploadPreviews.value.forEach((preview) => URL.revokeObjectURL(preview));
+  filesToUpload.value = [];
+  filesToUploadPreviews.value = [];
+};
+
+const removeFilePreview = (index: number) => {
+  const [preview] = filesToUploadPreviews.value.splice(index, 1);
+  if (preview) URL.revokeObjectURL(preview);
+  filesToUpload.value.splice(index, 1);
+};
+
+const addFilesToUpload = (selectedFiles: File[]) => {
+  fieldErrors.value.imagesInput = "";
+
+  if (selectedFiles.length === 0) return;
+
+  const validFiles = selectedFiles.filter((file) =>
+    allowedImageTypes.has(file.type),
+  );
+
+  if (validFiles.length !== selectedFiles.length) {
+    fieldErrors.value.imagesInput =
+      "Solo se aceptan imágenes JPG, PNG o WebP.";
+  }
+
+  const availableSlots = maxFilesToUpload - filesToUpload.value.length;
+
+  if (availableSlots <= 0) {
+    fieldErrors.value.imagesInput = `Se pueden subir como máximo ${maxFilesToUpload} imágenes por vez.`;
+    return;
+  }
+
+  const filesToAdd = validFiles.slice(0, availableSlots);
+
+  if (filesToAdd.length < validFiles.length) {
+    fieldErrors.value.imagesInput = `Se pueden subir como máximo ${maxFilesToUpload} imágenes por vez.`;
+  }
+
+  filesToUpload.value.push(...filesToAdd);
+  filesToUploadPreviews.value.push(
+    ...filesToAdd.map((file) => URL.createObjectURL(file)),
+  );
+};
+
+const handleFilesChanged = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  addFilesToUpload(Array.from(input.files ?? []));
+  input.value = "";
+};
+
+const handleImagesDrop = (event: DragEvent) => {
+  isDraggingImages.value = false;
+  addFilesToUpload(Array.from(event.dataTransfer?.files ?? []));
+};
+
+onBeforeUnmount(() => {
+  clearSelectedFiles();
+});
 
 watch(
   newProduct,
@@ -202,16 +294,10 @@ watch(
           >
             Descripción
           </label>
-          <textarea
+          <AdminProductMarkdownEditor
             id="product-description"
             v-model="newProduct.description"
-            rows="4"
-            :class="[
-              'block w-full rounded-md bg-white px-3 py-2 shadow-sm focus:outline-none dark:bg-gray-900 dark:text-gray-100',
-              fieldErrors.description
-                ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700',
-            ]"
+            :invalid="Boolean(fieldErrors.description)"
             placeholder="Describe el producto con claridad..."
           />
           <!-- <UInput
@@ -242,7 +328,7 @@ watch(
               </label>
               <input
                 id="product-price"
-                v-model="newProduct.price"
+                v-model.number="newProduct.price"
                 type="number"
                 min="0"
                 step="1"
@@ -327,7 +413,7 @@ watch(
                 </button>
               </div>
             </div>
-            <textarea
+            <!-- <textarea
               id="product-images"
               v-model="newProduct.images"
               rows="4"
@@ -338,9 +424,69 @@ watch(
                   : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700',
               ]"
               placeholder="https://ejemplo.com/imagen-1.jpg"
-            />
+            /> -->
+            <!-- Files to upload preview -->
+            <ClientOnly>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div
+                  v-for="(image, index) in filesToUploadPreviews"
+                  :key="image"
+                >
+                  <div class="overflow-hidden rounded-lg relative">
+                    <img
+                      :src="image"
+                      :alt="`Previsualización ${index + 1}`"
+                      class="h-20 w-full object-cover"
+                    />
+                    <UButton
+                      type="button"
+                      color="error"
+                      icon="i-lucide-x"
+                      class="absolute top-2 right-2"
+                      @click="removeFilePreview(index)"
+                    />
+                  </div>
+                </div>
+              </div>
+            </ClientOnly>
+            <label
+              v-if="!isSubmitting"
+              for="product-images"
+              class="flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed bg-white px-4 py-8 text-center transition dark:bg-gray-900"
+              :class="[
+                fieldErrors.imagesInput
+                  ? 'border-red-500 text-red-600 dark:border-red-500 dark:text-red-400'
+                  : isDraggingImages
+                    ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300'
+                    : 'border-gray-300 text-gray-600 hover:border-blue-400 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:bg-gray-800',
+              ]"
+              @dragenter.prevent="isDraggingImages = true"
+              @dragover.prevent="isDraggingImages = true"
+              @dragleave.prevent="isDraggingImages = false"
+              @drop.prevent="handleImagesDrop"
+            >
+              <UIcon
+                name="i-lucide-image-up"
+                class="mb-3 size-8"
+                aria-hidden="true"
+              />
+              <span class="text-sm font-medium">
+                Arrastra imágenes aquí o haz clic para seleccionarlas
+              </span>
+              <span class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                JPG, PNG o WebP. Máximo 5 por guardado.
+              </span>
+              <input
+                id="product-images"
+                class="sr-only"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                @change="handleFilesChanged"
+              />
+            </label>
             <p class="text-sm text-gray-500 dark:text-gray-400">
-              Ingresa una URL por línea.
+              Las imágenes nuevas se agregarán al guardar el producto.
             </p>
             <p v-if="fieldErrors.imagesInput" class="text-sm text-red-600">
               {{ fieldErrors.imagesInput }}

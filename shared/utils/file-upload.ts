@@ -13,7 +13,7 @@ cloudinary.config({
 // ─── Constantes ────────────────────────────────────────────────────────────
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3 MB en bytes
 const UPLOAD_FOLDER = "mi-sitio-nuxt"; // Carpeta destino en Cloudinary
-const ALLOWED_FORMATS = ["jpg", "jpeg", "png"] as const;
+const ALLOWED_FORMATS = ["jpg", "jpeg", "png", "webp"] as const;
 const IMAGE_CONFIG = {
   width: 600,
   height: 400,

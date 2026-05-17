@@ -1,7 +1,15 @@
 <script setup lang="ts">
+import security from "@comark/nuxt/plugins/security";
+
 defineProps<{
   product: Product;
 }>();
+
+const markdownPlugins = [
+  security({
+    blockedTags: ["script", "style", "iframe", "object", "embed"],
+  }),
+];
 </script>
 
 <template>
@@ -14,7 +22,9 @@ defineProps<{
 
     <div class="mt-4">
       <h3 class="text-lg font-bold">{{ product.name }}</h3>
-      <p class="text-sm text-gray-500">{{ product.description }}</p>
+      <div class="markdown-content markdown-content-compact text-sm text-gray-500">
+        <Comark :markdown="product.description" :plugins="markdownPlugins" />
+      </div>
     </div>
 
     <template #footer>

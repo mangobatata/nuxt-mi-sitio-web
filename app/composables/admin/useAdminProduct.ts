@@ -6,13 +6,18 @@ export const useAdminProduct = async (id: string) => {
   const createOrUpdate = async (data: Partial<Product>, files?: File[]) => {
     const isCreating = data.id === 0;
     const formData = new FormData();
+
     // form-Multipart data + archivos
-    formData.append('data', JSON.stringify(data));
+    formData.append("data", JSON.stringify(data));
+
+    for (const file of files ?? []) {
+      formData.append("images", file);
+    }
 
     if (isCreating) {
       const { product } = await $fetch("/api/admin/product", {
         method: "POST",
-        body: data,
+        body: formData,
       });
 
       return product;

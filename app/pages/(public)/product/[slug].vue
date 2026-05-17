@@ -1,6 +1,13 @@
 <script setup lang="ts">
+import security from "@comark/nuxt/plugins/security";
+
 const route = useRoute();
 const slug = route.params.slug as string;
+const markdownPlugins = [
+  security({
+    blockedTags: ["script", "style", "iframe", "object", "embed"],
+  }),
+];
 // Simulación de productos - en producción esto vendría de una API
 
 const { product } = await useProduct(slug);
@@ -105,9 +112,12 @@ const totalPrice = computed(() => {
         <!-- Description -->
         <div>
           <h2 class="text-lg font-semibold mb-2">Descripción</h2>
-          <p class="leading-relaxed">
-            {{ product.description }}
-          </p>
+          <div class="markdown-content leading-relaxed">
+            <Comark
+              :markdown="product.description"
+              :plugins="markdownPlugins"
+            />
+          </div>
         </div>
 
         <USeparator />

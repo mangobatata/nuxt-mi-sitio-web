@@ -23,7 +23,12 @@ import { dayMonthYearFormat } from "@@/shared/utils/date-formats";
 // entonces lo resolvemos con resolveComponent.
 const UBadge = resolveComponent("UBadge");
 
+const UButton = resolveComponent("UButton");
+
 const NuxtLink = resolveComponent("NuxtLink");
+
+const toast = useToast();
+const deletingProductId = ref<number | null>(null);
 
 // Usamos nuestro composable personalizado para traer productos paginados.
 //
@@ -38,7 +43,43 @@ const NuxtLink = resolveComponent("NuxtLink");
 //
 // total:
 // Total de productos disponibles.
-const { products, currentPage, perPage, total } = await usePaginatedProducts();
+const { products, currentPage, perPage, total, execute } =
+  await usePaginatedProducts();
+
+const deleteProduct = async (product: Product) => {
+  if (deletingProductId.value) return;
+
+  const confirmed = window.confirm(
+    `¿Seguro que quieres eliminar "${product.name}"? Esta acción no se puede deshacer.`,
+  );
+
+  if (!confirmed) return;
+
+  deletingProductId.value = product.id;
+
+  try {
+    await $fetch(`/api/admin/product/${product.id}`, {
+      method: "DELETE",
+    });
+
+    toast.add({
+      title: "Producto eliminado",
+      description: `El producto ${product.name} fue eliminado correctamente.`,
+      color: "success",
+    });
+
+    await execute();
+  } catch (error) {
+    toast.add({
+      title: "No se pudo eliminar el producto",
+      description:
+        error instanceof Error ? error.message : "Inténtalo nuevamente.",
+      color: "error",
+    });
+  } finally {
+    deletingProductId.value = null;
+  }
+};
 
 // Definimos las columnas que tendrá la tabla.
 // `TableColumn<Product>[]` significa que estas columnas pertenecen
@@ -203,6 +244,31 @@ const columns: TableColumn<Product>[] = [
       //
       // Si no existe, mostramos un string vacío.
       return value ? dayMonthYearFormat(new Date(value as string)) : "";
+    },
+  },
+
+  {
+    id: "actions",
+    header: "Acciones",
+    cell: ({ row }) => {
+      const product = row.original as Product;
+
+      return h(
+        UButton,
+        {
+          icon: "i-lucide-trash-2",
+          color: "error",
+          variant: "ghost",
+          size: "sm",
+          square: true,
+          loading: deletingProductId.value === product.id,
+          disabled: Boolean(deletingProductId.value),
+          "aria-label": `Eliminar ${product.name}`,
+          title: `Eliminar ${product.name}`,
+          onClick: () => deleteProduct(product),
+        },
+        () => "",
+      );
     },
   },
 ];

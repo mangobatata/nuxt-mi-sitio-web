@@ -7,6 +7,77 @@
   --ui-radius: 0.5rem;
 }
 
+.markdown-content :where(h1, h2, h3, h4, h5, h6) {
+  margin: 1rem 0 0.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.markdown-content :where(h1) {
+  font-size: 1.5rem;
+}
+
+.markdown-content :where(h2) {
+  font-size: 1.25rem;
+}
+
+.markdown-content :where(h3) {
+  font-size: 1.125rem;
+}
+
+.markdown-content :where(p, ul, ol, blockquote, pre) {
+  margin: 0.75rem 0;
+}
+
+.markdown-content :where(ul, ol) {
+  padding-left: 1.5rem;
+}
+
+.markdown-content :where(ul) {
+  list-style: disc;
+}
+
+.markdown-content :where(ol) {
+  list-style: decimal;
+}
+
+.markdown-content :where(a) {
+  color: var(--ui-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.markdown-content :where(code) {
+  border-radius: 0.25rem;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  padding: 0.125rem 0.25rem;
+  font-size: 0.875em;
+}
+
+.markdown-content :where(pre) {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  background: #111827;
+  padding: 1rem;
+  color: #f9fafb;
+}
+
+.markdown-content :where(pre code) {
+  background: transparent;
+  padding: 0;
+}
+
+.markdown-content-compact {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.markdown-content-compact :where(h1, h2, h3, h4, h5, h6, p, ul, ol, blockquote, pre) {
+  margin: 0.25rem 0;
+}
+
 /* body {
   background-color: #020420;
   font-family: "Roboto", sans-serif;
