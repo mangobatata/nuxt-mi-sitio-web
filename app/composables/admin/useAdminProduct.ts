@@ -9,35 +9,35 @@ export const useAdminProduct = async (id: string) => {
     // form-Multipart data + archivos
     formData.append('data', JSON.stringify(data));
 
-    // if (isCreating) {
-    //   const { product } = await $fetch("/api/admin/product", {
-    //     method: "POST",
-    //     body: data,
-    //   });
+    if (isCreating) {
+      const { product } = await $fetch("/api/admin/product", {
+        method: "POST",
+        body: data,
+      });
 
-    //   return product;
-    // }
+      return product;
+    }
 
-    // if (!isCreating) {
-    //   try {
-    //     const { product } = await $fetch(`/api/admin/product/${id}`, {
-    //       method: "PATCH",
-    //       body: formData,
-    //     });
+    if (!isCreating) {
+      try {
+        const { product } = await $fetch(`/api/admin/product/${id}`, {
+          method: "PATCH",
+          body: formData,
+        });
 
-    //     return product;
-    //   } catch (error) {
-    //     throw createError({
-    //       status: 400,
-    //       message: error instanceof Error ? error.message : "Unknown error",
-    //     });
-    //   }
-    // }
+        return product;
+      } catch (error) {
+        throw createError({
+          status: 400,
+          message: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    }
 
-    // throw createError({
-    //   status: 501,
-    //   message: "Product creation is not implemented yet",
-    // });
+    throw createError({
+      status: 501,
+      message: "Product creation is not implemented yet",
+    });
   };
 
   return {

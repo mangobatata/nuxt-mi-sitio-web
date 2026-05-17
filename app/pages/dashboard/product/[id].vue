@@ -84,6 +84,21 @@ const handleSubmit = async () => {
 
   console.log(newProduct.value);
   const product = await createOrUpdate(newProduct.value);
+
+  if (isCreating.value) {
+    // navigateTo
+    router.replace(
+      `/dashboard/product/${product.id}?message=Producto creado correctamente`,
+    );
+    return;
+  }
+
+  // TODO: limpiar los archivos seleccionados
+
+  toast.add({
+    title: "Producto actualizado correctamente",
+    description: `El producto ${product.name}, ha sido actualizado correctamente`,
+  });
 };
 
 const handleCancel = () => {
