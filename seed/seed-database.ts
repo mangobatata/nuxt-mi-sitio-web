@@ -4,6 +4,7 @@ import argon2 from "argon2";
 
 import prisma from "../lib/prisma.ts";
 import { products } from "./products.seed.ts";
+import { productReviews } from "./product-reviews.seed";
 import { siteReviews } from "./site-review.seed.ts";
 import { users } from "./users.seed.ts";
 
@@ -23,6 +24,7 @@ function generateSlug(name: string) {
 
 async function seedDatabase() {
   // Purgar base de datos
+  await prisma.productReview.deleteMany();
   await prisma.siteReview.deleteMany();
   await prisma.product.deleteMany();
   await prisma.user.deleteMany();
@@ -53,6 +55,20 @@ async function seedDatabase() {
   // Insertar usuarios con contraseña hasheada
   await prisma.user.createMany({
     data: usersWithHashedPassword,
+  });
+
+  // Obtener los productos (usuarios) para tomar sus ids
+  const productsCreated = await prisma.product.findMany();
+  const usersCreated = await prisma.user.findMany();
+
+  const productReviewsCreated = productReviews.map((review) => ({
+    ...review,
+    productId: productsCreated[Math.floor(Math.random() * products.length)].id,
+    userId: usersCreated[Math.floor(Math.random() * users.length)].id,
+  }));
+
+  await prisma.productReview.createMany({
+    data: productReviewsCreated,
   });
 
   console.log("Database seeded successfully");
