@@ -1,33 +1,35 @@
-En esta sección aprenderás a integrar y manejar la carga de archivos en tu proyecto, desde la preparación del espacio de almacenamiento en Cloudinary hasta el envío, recepción, limpieza y visualización local de las imágenes. Una sección práctica centrada en flujo real de archivos.
+En esta sección construimos todo el sistema de reseñas de productos, incluyendo la relación uno-a-muchos, el seed inicial, endpoints para consultar y crear reseñas, y el componente visual para mostrarlas y permitir que el usuario agregue nuevas reseñas desde el sitio web.
 
 [Nuxt - Prisma](https://www.prisma.io/docs/guides/frameworks/nuxt)
 
-Puntualmente veremos:
+Relación Uno a Muchos (Maestro-Detalle)
 
-Preparar almacenamiento en Cloudinary
+Configuración de la relación entre productos y reseñas en la base de datos.
 
-Configuración del espacio y credenciales necesarias.
+Seed de Reseñas
 
-Función de carga de archivos
+Crear datos iniciales de reseñas para pruebas y desarrollo.
 
-Creación de una función reutilizable para manejar uploads.
+Asignar Usuario a las Reseñas
 
-Envío y recepción de archivos
+Asociar cada reseña con el usuario autenticado.
 
-Implementación del backend y frontend para subir y recibir archivos.
+Server Endpoint — Obtener Reseñas
 
-Subir archivos a Cloudinary
+Endpoint para consultar reseñas por producto.
 
-Conexión directa con Cloudinary usando su SDK.
+Mostrar Reseñas en la UI
 
-Limpieza de archivos temporales
+Renderizar la lista de reseñas dentro de la página del producto.
 
-Eliminación de imágenes o archivos locales después de procesarlos.
+Modal para Reseñas
 
-Mostrar vistas previas locales
+Preparación del modal que permitirá al usuario crear nuevas reseñas.
 
-Visualizar archivos antes de enviarlos a almacenamiento remoto.
+Solución de hidratación
 
-(Opcional) Migrar pnpm a yarn
+Corrección de problemas comunes al renderizar reseñas en el cliente.
 
-Alternativa de gestor de paquetes para quien lo prefiera.
+Server Endpoint — Crear Reseña
+
+Endpoint que permite registrar nuevas reseñas en el servidor.
