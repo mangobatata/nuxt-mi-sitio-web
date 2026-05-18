@@ -195,20 +195,7 @@ export default defineEventHandler(async (event) => {
 
   // 3. Crear el producto en la base de datos
   const product = await prisma.product.create({
-    data: {
-      ...productData,
-      changes: {
-        create: {
-          productName: body.name,
-          action: "created",
-          changes: {
-            status: body.status,
-            slug: body.slug,
-            name: body.name,
-          },
-        },
-      },
-    },
+    data: productData,
   });
 
   // 4. Responder con 201 Created y el producto creado

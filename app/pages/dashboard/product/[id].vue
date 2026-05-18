@@ -50,12 +50,6 @@ if (error.value) {
 const newProduct = ref<Product | null>(
   structuredClone(product.value) as Product,
 );
-const { data: productHistory, refresh: refreshHistory } = await useFetch<
-  ProductChange[]
->(`/api/admin/product/${rawId}/history`, {
-  immediate: rawId !== "new",
-  default: () => [],
-});
 const selectedImageIndex = ref(0);
 const isSubmitting = ref(false);
 const fieldErrors = ref<Record<string, string>>({});
@@ -116,9 +110,6 @@ const selectedImage = computed(() => {
   );
 });
 
-const formatChangeDetails = (changes: Record<string, unknown>) =>
-  JSON.stringify(changes, null, 2);
-
 const checkValidations = () => {
   fieldErrors.value = {};
 
@@ -169,7 +160,6 @@ const handleSubmit = async () => {
 
     newProduct.value = structuredClone(product) as Product;
     clearSelectedFiles();
-    await refreshHistory();
 
     toast.add({
       title: "Producto actualizado correctamente",
@@ -758,34 +748,6 @@ watch(
         </dl>
       </section>
 
-      <section
-        v-if="!isCreating"
-        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900"
-      >
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-          Historial de cambios
-        </h2>
-        <div v-if="productHistory?.length" class="mt-4 space-y-3">
-          <div
-            v-for="entry in productHistory"
-            :key="entry.id"
-            class="rounded-md border border-gray-200 p-3 dark:border-gray-800"
-          >
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <UBadge variant="subtle" color="neutral">
-                {{ entry.action }}
-              </UBadge>
-              <span class="text-sm text-gray-500 dark:text-gray-400">
-                {{ longDateTimeFormat(new Date(entry.createdAt)) }}
-              </span>
-            </div>
-            <pre class="mt-2 overflow-x-auto rounded bg-gray-50 p-2 text-xs text-gray-700 dark:bg-gray-950 dark:text-gray-300">{{ formatChangeDetails(entry.changes) }}</pre>
-          </div>
-        </div>
-        <p v-else class="mt-4 text-sm text-gray-500 dark:text-gray-400">
-          Sin cambios registrados todavía.
-        </p>
-      </section>
     </div>
   </div>
 </template>
