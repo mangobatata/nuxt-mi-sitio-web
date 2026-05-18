@@ -10,15 +10,16 @@ const { data: productSuggestions, status } = await useFetch<Product[]>(
   {
     default: () => [],
     watch: [suggestionsUrl],
-     lazy: true,
+    lazy: true,
     server: false,
-    cache: 'force-cache',
+    cache: "force-cache",
   },
 );
 </script>
 
 <template>
-  <div>
+  <!-- ClientOnly solo renderiza el contenido en el cliente, evitando problemas de renderizado en el servidor. -->
+  <ClientOnly>
     <div
       v-if="status === 'pending'"
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
@@ -29,5 +30,5 @@ const { data: productSuggestions, status } = await useFetch<Product[]>(
     </div>
 
     <ProductsGrid v-else :products="productSuggestions" />
-  </div>
+  </ClientOnly>
 </template>
