@@ -1,5 +1,8 @@
 <script setup lang="ts">
-const { data: testimonials } = await useFetch('/api/home/reviews');
+const { data: testimonials } = await useFetch("/api/home/reviews", {
+  default: () => [],
+  server: false,
+});
 </script>
 
 <template>

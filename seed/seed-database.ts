@@ -49,6 +49,7 @@ async function seedDatabase() {
     data: products.map((product) => ({
       ...product,
       slug: generateSlug(product.name),
+      status: "active",
     })),
   });
 

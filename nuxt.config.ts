@@ -49,8 +49,8 @@ export default defineNuxtConfig({
   // Prender - Todo el sitio
   nitro: {
     prerender: {
-      routes: ["/", "/about", "/contact", "/pricing", "/products"],
-      ignore: ["/dashboard", "/dashboard/**"],
+      routes: ["/", "/about", "/contact", "/pricing"],
+      ignore: ["/dashboard", "/dashboard/**", "/products"],
       // Habilitar el crawling para descubrir enlaces automáticamente
       crawlLinks: true,
     },

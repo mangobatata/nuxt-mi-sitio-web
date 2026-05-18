@@ -9,9 +9,10 @@
 //   },
 // });
 const publicStatus = ref("active");
-const { products, total, currentPage, perPage } = await usePaginatedProducts({
-  status: publicStatus,
-});
+const { products, total, currentPage, perPage, error, pending } =
+  await usePaginatedProducts({
+    status: publicStatus,
+  });
 </script>
 
 <template>
@@ -29,9 +30,35 @@ const { products, total, currentPage, perPage } = await usePaginatedProducts({
 
   <div class="mt-10" />
 
-  <ProductsGrid :products="products" />
+  <UAlert
+    v-if="error"
+    color="error"
+    variant="soft"
+    icon="i-lucide-circle-alert"
+    title="No se pudieron cargar los productos"
+    description="Revisá la conexión a la base de datos y volvé a intentar."
+  />
+
+  <div
+    v-else-if="pending"
+    class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+  >
+    <USkeleton v-for="item in 8" :key="item" class="h-80 w-full rounded-lg" />
+  </div>
+
+  <UAlert
+    v-else-if="products.length === 0"
+    color="neutral"
+    variant="soft"
+    icon="i-lucide-package-open"
+    title="No hay productos activos"
+    description="Publicá productos desde el dashboard o volvé a correr el seed actualizado."
+  />
+
+  <ProductsGrid v-else :products="products" />
 
   <SharedPagination
+    v-if="total > 0"
     :total="total"
     :model-value="currentPage"
     :per-page="perPage"
